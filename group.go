@@ -40,18 +40,23 @@ func (ge *GroupEntry) Parse(s string) error {
 
 // A GroupMap is a complete list of groups that can be written and
 // used by the system.
-type GroupMap []*GroupEntry
+type GroupMap struct {
+	lines []*GroupEntry
+}
 
-// Parse loads from the specified reader into a list of GroupEntry.
-func (gm *GroupMap) Parse(r io.Reader) error {
-	*gm = []*GroupEntry{}
+// ParseGroupMap loads from the specified reader into a list of
+// GroupEntry.
+func ParseGroupMap(r io.Reader) (*GroupMap, error) {
+	lines := []*GroupEntry{}
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		t := new(GroupEntry)
 		if err := t.Parse(scanner.Text()); err != nil {
-			return err
+			return nil, err
 		}
-		*gm = append(*gm, t)
+		lines = append(lines, t)
 	}
-	return nil
+	gm := new(GroupMap)
+	gm.lines = lines
+	return gm, nil
 }

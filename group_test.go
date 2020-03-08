@@ -55,8 +55,7 @@ func TestParseGroupMap(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		gm := new(GroupMap)
-		if err := gm.Parse(c.r); err != c.wantErr {
+		if _, err := ParseGroupMap(c.r); err != c.wantErr {
 			t.Errorf("%d: Got %v; Want %v", i, err, c.wantErr)
 		}
 	}

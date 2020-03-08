@@ -54,19 +54,23 @@ func (pe *PasswdEntry) Parse(s string) error {
 
 // A PasswdMap is a complete set of passwd entries that can be written
 // and used as a list of entities on a system.
-type PasswdMap []*PasswdEntry
+type PasswdMap struct {
+	lines []*PasswdEntry
+}
 
-// Parse loads a specified reader into a password map for
+// ParsePasswdMap loads a specified reader into a password map for
 // manipulation.
-func (pm *PasswdMap) Parse(r io.Reader) error {
-	*pm = []*PasswdEntry{}
+func ParsePasswdMap(r io.Reader) (*PasswdMap, error) {
+	lines := []*PasswdEntry{}
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		t := new(PasswdEntry)
 		if err := t.Parse(scanner.Text()); err != nil {
-			return err
+			return nil, err
 		}
-		*pm = append(*pm, t)
+		lines = append(lines, t)
 	}
-	return nil
+	pm := new(PasswdMap)
+	pm.lines = lines
+	return pm, nil
 }

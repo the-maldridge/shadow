@@ -68,8 +68,7 @@ func TestParsePasswdMap(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		pm := new(PasswdMap)
-		if err := pm.Parse(c.r); err != c.wantErr {
+		if _, err := ParsePasswdMap(c.r); err != c.wantErr {
 			t.Errorf("%d: Got %v; Want %v", i, err, c.wantErr)
 		}
 	}
