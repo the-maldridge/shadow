@@ -53,6 +53,10 @@ func TestParseGroupMap(t *testing.T) {
 			r:       strings.NewReader("kvm:x:24:maldridge,libvirt"),
 			wantErr: nil,
 		},
+		{
+			r:       strings.NewReader("kvm:x:24:"),
+			wantErr: nil,
+		},
 	}
 	for i, c := range cases {
 		if _, err := ParseGroupMap(c.r); err != c.wantErr {

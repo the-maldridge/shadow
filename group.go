@@ -19,7 +19,7 @@ type GroupEntry struct {
 // Parse reads a single entry of the group map.  Parsing will fail if
 // a group has too many members to load in a single pass.
 func (ge *GroupEntry) Parse(s string) error {
-	fields := strings.FieldsFunc(s, func(c rune) bool { return c == ':' })
+	fields := strings.Split(s, ":")
 	if len(fields) != 4 {
 		return ErrWrongNumFields
 	}
