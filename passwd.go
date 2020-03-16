@@ -34,7 +34,7 @@ func (pe PasswdEntry) String() string {
 // string, or if the string contains illegal characters such as
 // newlines.
 func (pe *PasswdEntry) Parse(s string) error {
-	fields := strings.FieldsFunc(s, func(c rune) bool { return c == ':' })
+	fields := strings.Split(s, ":")
 	if len(fields) != 7 {
 		return ErrWrongNumFields
 	}
