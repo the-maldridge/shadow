@@ -7,6 +7,18 @@ import (
 	"time"
 )
 
+func TestShadowEntryString(t *testing.T) {
+	x := ShadowEntry{
+		Login:    "foo",
+		Password: "*",
+	}
+
+	want := "L: foo P: * LC: 01 Jan 01 00:00 +0000 mPA: 0 MPA: 0 WD: 0 ID: 0 E: 01 Jan 01 00:00 +0000 R: "
+	if x.String() != want {
+		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
+	}
+}
+
 func TestParseShadowEntry(t *testing.T) {
 	cases := []struct {
 		line      string
@@ -40,6 +52,26 @@ func TestParseShadowEntry(t *testing.T) {
 		if *se != c.wantEntry {
 			t.Errorf("%d: Got \n%+v; Want \n%+v", i, *se, c.wantEntry)
 		}
+	}
+}
+
+func TestShadowMapString(t *testing.T) {
+	x := ShadowMap{
+		lines: []*ShadowEntry{
+			&ShadowEntry{
+				Login:    "foo",
+				Password: "*",
+			},
+			&ShadowEntry{
+				Login:    "bar",
+				Password: "!",
+			},
+		},
+	}
+
+	want := "L: foo P: * LC: 01 Jan 01 00:00 +0000 mPA: 0 MPA: 0 WD: 0 ID: 0 E: 01 Jan 01 00:00 +0000 R: \nL: bar P: ! LC: 01 Jan 01 00:00 +0000 mPA: 0 MPA: 0 WD: 0 ID: 0 E: 01 Jan 01 00:00 +0000 R: \n"
+	if x.String() != want {
+		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
 	}
 }
 

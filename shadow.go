@@ -2,7 +2,6 @@ package shadow
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -31,20 +30,30 @@ type ShadowEntry struct {
 	Reserved           string
 }
 
+func (se ShadowEntry) String() string {
+	return "L: " + se.Login +
+		" P: " + se.Password +
+		" LC: " + se.LastChanged.Format(time.RFC822Z) +
+		" mPA: " + strconv.Itoa(se.MinimumPasswordAge) +
+		" MPA: " + strconv.Itoa(se.MaximumPasswordAge) +
+		" WD: " + strconv.Itoa(se.WarningDays) +
+		" ID: " + strconv.Itoa(se.InactivityDays) +
+		" E: " + se.Expiration.Format(time.RFC822Z) +
+		" R: " + se.Reserved
+}
+
 // Parse converts a string to a ShadowEntry.
 func (se *ShadowEntry) Parse(s string) error {
 	fields := strings.Split(s, ":")
 	if len(fields) != 9 {
 		return ErrWrongNumFields
 	}
-	fmt.Println(fields)
 
 	se.Login = fields[0]
 	se.Password = fields[1]
 
 	lcdays, _ := strconv.Atoi(fields[2])
 	se.LastChanged = epochStart.Add(time.Hour * 24 * time.Duration(lcdays))
-	fmt.Println(se.LastChanged)
 
 	minAge, _ := strconv.Atoi(fields[3])
 	se.MinimumPasswordAge = minAge
@@ -70,6 +79,15 @@ func (se *ShadowEntry) Parse(s string) error {
 // written and used for authentication by a host.
 type ShadowMap struct {
 	lines []*ShadowEntry
+}
+
+func (sm ShadowMap) String() string {
+	out := new(strings.Builder)
+	for _, l := range sm.lines {
+		out.WriteString(l.String())
+		out.WriteRune('\n')
+	}
+	return out.String()
 }
 
 // ParseShadowMap parses the values from r and converts it to a
