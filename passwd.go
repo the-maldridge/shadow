@@ -19,6 +19,16 @@ type PasswdEntry struct {
 	Shell    string
 }
 
+func (pe PasswdEntry) String() string {
+	return "L: " + pe.Login +
+		" P: " + pe.Password +
+		" U: " + strconv.Itoa(pe.UID) +
+		" G: " + strconv.Itoa(pe.GID) +
+		" C: " + pe.Comment +
+		" H: " + pe.Home +
+		" S: " + pe.Shell
+}
+
 // Parse parses a single line into a PasswdEntry struct.  Errors
 // are returned if the wrong number of fields are present in the input
 // string, or if the string contains illegal characters such as
@@ -56,6 +66,15 @@ func (pe *PasswdEntry) Parse(s string) error {
 // and used as a list of entities on a system.
 type PasswdMap struct {
 	lines []*PasswdEntry
+}
+
+func (pm PasswdMap) String() string {
+	b := new(strings.Builder)
+	for _, l := range pm.lines {
+		b.WriteString(l.String())
+		b.WriteRune('\n')
+	}
+	return b.String()
 }
 
 // ParsePasswdMap loads a specified reader into a password map for
