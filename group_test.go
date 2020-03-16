@@ -6,6 +6,20 @@ import (
 	"testing"
 )
 
+func TestGroupEntryString(t *testing.T) {
+	x := GroupEntry{
+		Name:     "group",
+		Password: "x",
+		GID:      42,
+		UserList: []string{"foo", "bar"},
+	}
+
+	want := "N: group P: x G: 42 M: foo,bar"
+	if x.String() != want {
+		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
+	}
+}
+
 func TestParseGroupEntry(t *testing.T) {
 	cases := []struct {
 		line     string
@@ -37,6 +51,30 @@ func TestParseGroupEntry(t *testing.T) {
 		if ge.Name != c.wantName {
 			t.Errorf("%d: Got Name %s; Want name %s", i, ge.Name, c.wantName)
 		}
+	}
+}
+
+func TestGroupMapString(t *testing.T) {
+	x := GroupMap{
+		lines: []*GroupEntry{
+			&GroupEntry{
+				Name:     "group",
+				Password: "x",
+				GID:      42,
+				UserList: []string{"foo", "bar"},
+			},
+			&GroupEntry{
+				Name:     "ungroup",
+				Password: "x",
+				GID:      43,
+				UserList: []string{"bar", "baz"},
+			},
+		},
+	}
+
+	want := "N: group P: x G: 42 M: foo,bar\nN: ungroup P: x G: 43 M: bar,baz\n"
+	if x.String() != want {
+		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
 	}
 }
 

@@ -16,6 +16,13 @@ type GroupEntry struct {
 	UserList []string
 }
 
+func (ge GroupEntry) String() string {
+	return "N: " + ge.Name +
+		" P: " + ge.Password +
+		" G: " + strconv.Itoa(ge.GID) +
+		" M: " + strings.Join(ge.UserList, ",")
+}
+
 // Parse reads a single entry of the group map.  Parsing will fail if
 // a group has too many members to load in a single pass.
 func (ge *GroupEntry) Parse(s string) error {
@@ -42,6 +49,15 @@ func (ge *GroupEntry) Parse(s string) error {
 // used by the system.
 type GroupMap struct {
 	lines []*GroupEntry
+}
+
+func (gm GroupMap) String() string {
+	out := new(strings.Builder)
+	for _, l := range gm.lines {
+		out.WriteString(l.String())
+		out.WriteRune('\n')
+	}
+	return out.String()
 }
 
 // ParseGroupMap loads from the specified reader into a list of
