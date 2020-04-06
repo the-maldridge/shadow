@@ -120,3 +120,60 @@ func TestParsePasswdMap(t *testing.T) {
 		}
 	}
 }
+
+func TestFilterUID(t *testing.T) {
+	pm := &PasswdMap{
+		lines: []*PasswdEntry{
+			&PasswdEntry{
+				Login: "login1",
+				UID:   1,
+			},
+			&PasswdEntry{
+				Login: "login2",
+				UID:   2,
+			},
+		},
+	}
+
+	res := pm.FilterUID(func(i int) bool { return i == 2 })
+	if len(res) != 1 || res[0].Login != "login2" {
+		t.Error("Filter applied incorrectly!")
+	}
+}
+
+func TestPasswdAdd(t *testing.T) {
+	pm := &PasswdMap{
+		lines: []*PasswdEntry{},
+	}
+
+	if len(pm.lines) > 0 {
+		t.Error("Wrong base condition")
+	}
+
+	pm.Add([]*PasswdEntry{&PasswdEntry{Login: "foo"}})
+
+	if len(pm.lines) != 1 {
+		t.Error("Add failed")
+	}
+}
+
+func TestPasswdDel(t *testing.T) {
+	pm := &PasswdMap{
+		lines: []*PasswdEntry{
+			&PasswdEntry{
+				Login: "login1",
+				UID:   1,
+			},
+			&PasswdEntry{
+				Login: "login2",
+				UID:   2,
+			},
+		},
+	}
+
+	pm.Del([]*PasswdEntry{&PasswdEntry{Login: "login1", UID: 1}})
+	if len(pm.lines) != 1 || pm.lines[0].Login != "login2" {
+		t.Logf("%v", pm.lines)
+		t.Error("Incorrect delete")
+	}
+}
