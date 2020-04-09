@@ -96,3 +96,56 @@ func TestParseShadowMap(t *testing.T) {
 		}
 	}
 }
+
+func TestFilterLogin(t *testing.T) {
+	pm := &ShadowMap{
+		lines: []*ShadowEntry{
+			&ShadowEntry{
+				Login: "login1",
+			},
+			&ShadowEntry{
+				Login: "login2",
+			},
+		},
+	}
+
+	res := pm.FilterUID(func(s string) bool { return s == "login2" })
+	if len(res) != 1 || res[0].Login != "login2" {
+		t.Error("Filter applied incorrectly!")
+	}
+}
+
+func TestShadowAdd(t *testing.T) {
+	pm := &ShadowMap{
+		lines: []*ShadowEntry{},
+	}
+
+	if len(pm.lines) > 0 {
+		t.Error("Wrong base condition")
+	}
+
+	pm.Add([]*ShadowEntry{&ShadowEntry{Login: "foo"}})
+
+	if len(pm.lines) != 1 {
+		t.Error("Add failed")
+	}
+}
+
+func TestShadowDel(t *testing.T) {
+	pm := &ShadowMap{
+		lines: []*ShadowEntry{
+			&ShadowEntry{
+				Login: "login1",
+			},
+			&ShadowEntry{
+				Login: "login2",
+			},
+		},
+	}
+
+	pm.Del([]*ShadowEntry{&ShadowEntry{Login: "login1"}})
+	if len(pm.lines) != 1 || pm.lines[0].Login != "login2" {
+		t.Logf("%v", pm.lines)
+		t.Error("Incorrect delete")
+	}
+}

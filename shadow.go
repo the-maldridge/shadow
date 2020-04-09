@@ -106,3 +106,49 @@ func ParseShadowMap(r io.Reader) (*ShadowMap, error) {
 	sm.lines = lines
 	return sm, nil
 }
+
+// FilterLogin applies a StringFilter to the Login field of all loaded
+// ShadowEntry's and returns a list of all entries that matched.
+func (sm *ShadowMap) FilterUID(f StringFilter) []*ShadowEntry {
+	nl := []*ShadowEntry{}
+	for _, l := range sm.lines {
+		if !f(l.Login) {
+			// Filter did not match.
+			continue
+		}
+		nl = append(nl, l)
+	}
+	return nl
+}
+
+// Add adds new shadow entries to the existing map.  Uniqueness is not
+// enforced.
+func (sm *ShadowMap) Add(a []*ShadowEntry) {
+	sm.lines = append(sm.lines, a...)
+}
+
+// Del iterates through the provided list and removes entities that
+// are exactly the same from the existing map.  The provided set must
+// not contain duplicate Login values, potentially necessitating two
+// calls if you have entries that are identical except for login.
+func (sm *ShadowMap) Del(d []*ShadowEntry) {
+	checkMap := make(map[string]*ShadowEntry, len(d))
+
+	for _, e := range d {
+		checkMap[e.Login] = e
+	}
+
+	out := []*ShadowEntry{}
+	for _, l := range sm.lines {
+		e, doTest := checkMap[l.Login]
+		if doTest && *l == *e {
+			// The entity is an exact match and should be
+			// removed.
+			continue
+		}
+		// The entity is not an exact match, and should be
+		// retained.
+		out = append(out, l)
+	}
+	sm.lines = out
+}
