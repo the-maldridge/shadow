@@ -76,3 +76,49 @@ func ParseGroupMap(r io.Reader) (*GroupMap, error) {
 	gm.lines = lines
 	return gm, nil
 }
+
+// FilterGID applies a NumericFilter to the UID field of all loaded
+// GroupEntry's and returns a list of all entries that matched.
+func (gm *GroupMap) FilterGID(f NumericFilter) []*GroupEntry {
+	ng := []*GroupEntry{}
+	for _, l := range gm.lines {
+		if !f(l.GID) {
+			// Filter did not match.
+			continue
+		}
+		ng = append(ng, l)
+	}
+	return ng
+}
+
+// Add adds new group entries to the existing map.  Uniqueness is not
+// enforced.
+func (gm *GroupMap) Add(a []*GroupEntry) {
+	gm.lines = append(gm.lines, a...)
+}
+
+// Del iterates through the provided list and removes entities that
+// are exactly the same from the existing map.  The provided set must
+// not contain duplicate Login values, potentially necessitating two
+// calls if you have entries that are identical except for login.
+func (gm *GroupMap) Del(d []*GroupEntry) {
+	checkMap := make(map[string]*GroupEntry, len(d))
+
+	for _, e := range d {
+		checkMap[e.Name] = e
+	}
+
+	out := []*GroupEntry{}
+	for _, l := range gm.lines {
+		e, doTest := checkMap[l.Name]
+		if doTest && l.Name == e.Name && l.GID == e.GID {
+			// The entity is a match and should be
+			// removed.
+			continue
+		}
+		// The entity is not an exact match, and should be
+		// retained.
+		out = append(out, l)
+	}
+	gm.lines = out
+}

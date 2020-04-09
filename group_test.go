@@ -102,3 +102,60 @@ func TestParseGroupMap(t *testing.T) {
 		}
 	}
 }
+
+func TestFilterGID(t *testing.T) {
+	gm := &GroupMap{
+		lines: []*GroupEntry{
+			&GroupEntry{
+				Name: "group1",
+				GID:  1,
+			},
+			&GroupEntry{
+				Name: "group2",
+				GID:  2,
+			},
+		},
+	}
+
+	res := gm.FilterGID(func(i int) bool { return i == 2 })
+	if len(res) != 1 || res[0].Name != "group2" {
+		t.Error("Filter applied incorrectly!")
+	}
+}
+
+func TestGroupAdd(t *testing.T) {
+	gm := &GroupMap{
+		lines: []*GroupEntry{},
+	}
+
+	if len(gm.lines) > 0 {
+		t.Error("Wrong base condition")
+	}
+
+	gm.Add([]*GroupEntry{&GroupEntry{Name: "foo"}})
+
+	if len(gm.lines) != 1 {
+		t.Error("Add failed")
+	}
+}
+
+func TestGroupDel(t *testing.T) {
+	gm := &GroupMap{
+		lines: []*GroupEntry{
+			&GroupEntry{
+				Name: "group1",
+				GID:  1,
+			},
+			&GroupEntry{
+				Name: "group2",
+				GID:  2,
+			},
+		},
+	}
+
+	gm.Del([]*GroupEntry{&GroupEntry{Name: "group1", GID: 1}})
+	if len(gm.lines) != 1 || gm.lines[0].Name != "group2" {
+		t.Logf("%v", gm.lines)
+		t.Error("Incorrect delete")
+	}
+}
