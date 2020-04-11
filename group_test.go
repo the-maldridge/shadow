@@ -14,7 +14,7 @@ func TestGroupEntryString(t *testing.T) {
 		UserList: []string{"foo", "bar"},
 	}
 
-	want := "N: group P: x G: 42 M: foo,bar"
+	want := "group:x:42:foo,bar"
 	if x.String() != want {
 		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
 	}
@@ -72,7 +72,7 @@ func TestGroupMapString(t *testing.T) {
 		},
 	}
 
-	want := "N: group P: x G: 42 M: foo,bar\nN: ungroup P: x G: 43 M: bar,baz\n"
+	want := "group:x:42:foo,bar\nungroup:x:43:bar,baz\n"
 	if x.String() != want {
 		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
 	}

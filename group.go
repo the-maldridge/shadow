@@ -17,10 +17,10 @@ type GroupEntry struct {
 }
 
 func (ge GroupEntry) String() string {
-	return "N: " + ge.Name +
-		" P: " + ge.Password +
-		" G: " + strconv.Itoa(ge.GID) +
-		" M: " + strings.Join(ge.UserList, ",")
+	return ge.Name + ":" +
+		ge.Password + ":" +
+		strconv.Itoa(ge.GID) + ":" +
+		strings.Join(ge.UserList, ",")
 }
 
 // Parse reads a single entry of the group map.  Parsing will fail if

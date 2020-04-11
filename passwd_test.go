@@ -17,7 +17,7 @@ func TestPasswdEntryString(t *testing.T) {
 		Shell:    "/bin/fooshell",
 	}
 
-	want := "L: foo P: x U: 2 G: 2 C: Foo H: /home/foo S: /bin/fooshell"
+	want := "foo:x:2:2:Foo:/home/foo:/bin/fooshell"
 	if pe.String() != want {
 		t.Errorf("Want '%s'; Got '%s'", want, pe.String())
 	}
@@ -94,7 +94,7 @@ func TestPasswdMapString(t *testing.T) {
 		},
 	}
 
-	want := "L: foo P: x U: 2 G: 2 C: Foo H: /home/foo S: /bin/fooshell\nL: bar P: x U: 3 G: 3 C: Bar H: /home/foo S: /bin/fooshell\n"
+	want := "foo:x:2:2:Foo:/home/foo:/bin/fooshell\nbar:x:3:3:Bar:/home/foo:/bin/fooshell\n"
 	if x.String() != want {
 		t.Errorf("Got: '%s'; Want '%s'", x.String(), want)
 	}

@@ -20,13 +20,13 @@ type PasswdEntry struct {
 }
 
 func (pe PasswdEntry) String() string {
-	return "L: " + pe.Login +
-		" P: " + pe.Password +
-		" U: " + strconv.Itoa(pe.UID) +
-		" G: " + strconv.Itoa(pe.GID) +
-		" C: " + pe.Comment +
-		" H: " + pe.Home +
-		" S: " + pe.Shell
+	return pe.Login + ":" +
+		pe.Password + ":" +
+		strconv.Itoa(pe.UID) + ":" +
+		strconv.Itoa(pe.GID) + ":" +
+		pe.Comment + ":" +
+		pe.Home + ":" +
+		pe.Shell
 }
 
 // Parse parses a single line into a PasswdEntry struct.  Errors
