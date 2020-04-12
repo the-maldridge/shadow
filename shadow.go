@@ -28,18 +28,32 @@ type ShadowEntry struct {
 	InactivityDays     int
 	Expiration         time.Time
 	Reserved           string
+
+	HasLastChanged        bool
+	HasMinimumPasswordAge bool
+	HasMaximumPasswordAge bool
+	HasWarningDays        bool
+	HasInactivityDays     bool
+	HasExpiration         bool
 }
 
 func (se ShadowEntry) String() string {
-	return "L: " + se.Login +
-		" P: " + se.Password +
-		" LC: " + se.LastChanged.Format(time.RFC822Z) +
-		" mPA: " + strconv.Itoa(se.MinimumPasswordAge) +
-		" MPA: " + strconv.Itoa(se.MaximumPasswordAge) +
-		" WD: " + strconv.Itoa(se.WarningDays) +
-		" ID: " + strconv.Itoa(se.InactivityDays) +
-		" E: " + se.Expiration.Format(time.RFC822Z) +
-		" R: " + se.Reserved
+	optf := func(f string, b bool) string {
+		if b {
+			return f
+		}
+		return ""
+	}
+
+	return se.Login + ":" +
+		se.Password + ":" +
+		optf(strconv.Itoa(int(se.LastChanged.Sub(epochStart).Hours()/24)), se.HasLastChanged) + ":" +
+		optf(strconv.Itoa(se.MinimumPasswordAge), se.HasMinimumPasswordAge) + ":" +
+		optf(strconv.Itoa(se.MaximumPasswordAge), se.HasMaximumPasswordAge) + ":" +
+		optf(strconv.Itoa(se.WarningDays), se.HasWarningDays) + ":" +
+		optf(strconv.Itoa(se.InactivityDays), se.HasInactivityDays) + ":" +
+		optf(strconv.Itoa(int(se.Expiration.Sub(epochStart).Hours()/24)), se.HasExpiration) + ":" +
+		se.Reserved
 }
 
 // Parse converts a string to a ShadowEntry.
@@ -54,21 +68,27 @@ func (se *ShadowEntry) Parse(s string) error {
 
 	lcdays, _ := strconv.Atoi(fields[2])
 	se.LastChanged = epochStart.Add(time.Hour * 24 * time.Duration(lcdays))
+	se.HasLastChanged = len(fields[2]) != 0
 
 	minAge, _ := strconv.Atoi(fields[3])
 	se.MinimumPasswordAge = minAge
+	se.HasMinimumPasswordAge = len(fields[3]) != 0
 
 	maxAge, _ := strconv.Atoi(fields[4])
 	se.MaximumPasswordAge = maxAge
+	se.HasMaximumPasswordAge = len(fields[4]) != 0
 
 	warningDays, _ := strconv.Atoi(fields[5])
 	se.WarningDays = warningDays
+	se.HasWarningDays = len(fields[5]) != 0
 
 	inactivityDays, _ := strconv.Atoi(fields[6])
 	se.InactivityDays = inactivityDays
+	se.HasInactivityDays = len(fields[6]) != 0
 
 	expirationDays, _ := strconv.Atoi(fields[7])
-	se.Expiration = epochStart.Add(time.Hour & 24 * time.Duration(expirationDays))
+	se.Expiration = epochStart.Add(time.Hour * 24 * time.Duration(expirationDays))
+	se.HasExpiration = len(fields[7]) != 0
 
 	se.Reserved = fields[8]
 

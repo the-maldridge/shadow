@@ -13,7 +13,7 @@ func TestShadowEntryString(t *testing.T) {
 		Password: "*",
 	}
 
-	want := "L: foo P: * LC: 01 Jan 01 00:00 +0000 mPA: 0 MPA: 0 WD: 0 ID: 0 E: 01 Jan 01 00:00 +0000 R: "
+	want := "foo:*:::::::"
 	if x.String() != want {
 		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
 	}
@@ -31,14 +31,27 @@ func TestParseShadowEntry(t *testing.T) {
 			wantErr:   ErrWrongNumFields,
 		},
 		{
+			// This struct is now wrong.  Needs to be
+			// fixed to handle that there are now a ton of
+			// flags.
 			line: "nobody:x:17518:0:99999:7:::",
 			wantEntry: ShadowEntry{
-				Login:              "nobody",
-				Password:           "x",
-				LastChanged:        time.Date(2017, time.December, 18, 0, 0, 0, 0, time.UTC),
-				MaximumPasswordAge: 99999,
-				WarningDays:        7,
-				Expiration:         epochStart,
+				LastChanged: time.Date(2017, time.December, 18, 0, 0, 0, 0, time.UTC),
+				Expiration:  epochStart,
+
+				Login:                 "nobody",
+				Password:              "x",
+				MinimumPasswordAge:    0,
+				MaximumPasswordAge:    99999,
+				WarningDays:           7,
+				InactivityDays:        0,
+				Reserved:              "",
+				HasLastChanged:        true,
+				HasMinimumPasswordAge: true,
+				HasMaximumPasswordAge: true,
+				HasWarningDays:        true,
+				HasInactivityDays:     false,
+				HasExpiration:         false,
 			},
 			wantErr: nil,
 		},
@@ -50,7 +63,7 @@ func TestParseShadowEntry(t *testing.T) {
 			t.Errorf("%d: Got %v; Want %v", i, err, c.wantErr)
 		}
 		if *se != c.wantEntry {
-			t.Errorf("%d: Got \n%+v; Want \n%+v", i, *se, c.wantEntry)
+			t.Errorf("%d: Got \n%v; Want \n%v", i, *se, c.wantEntry)
 		}
 	}
 }
@@ -69,7 +82,7 @@ func TestShadowMapString(t *testing.T) {
 		},
 	}
 
-	want := "L: foo P: * LC: 01 Jan 01 00:00 +0000 mPA: 0 MPA: 0 WD: 0 ID: 0 E: 01 Jan 01 00:00 +0000 R: \nL: bar P: ! LC: 01 Jan 01 00:00 +0000 mPA: 0 MPA: 0 WD: 0 ID: 0 E: 01 Jan 01 00:00 +0000 R: \n"
+	want := "foo:*:::::::\nbar:!:::::::\n"
 	if x.String() != want {
 		t.Errorf("Got: '%s'; Want: '%s'", x.String(), want)
 	}
